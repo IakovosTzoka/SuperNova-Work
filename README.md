@@ -6,7 +6,7 @@ This repository is dedicated to the simulation work working regarding the SuperN
 This work highlights different core colapse models and different juyter notebooks to analyze said models. 
 
 
-The SN_Garching_Model.ipynb is a jupyter notebook that non oscilated pinched files together with the garching_pinched_info_key.dat and garching_pinched_info.dat file to plot the luminocity, the average energy and the pinch parameter as a function of time. 
+This Python script processes and visualizes neutrino flux data from the Garching supernova simulations. It reads time-bin mappings from garching_pinched_info_key.dat and corresponding alpha, energy, and luminosity values from garching_pinched_info.dat, matching them based on their first-column IDs. The script then organizes and filters the data, ensuring proper alignment before plotting time-dependent trends for different neutrino species (ν_e, ν̅_e, ν_x). The visualization includes logarithmic scaling, core bounce reference, and distinct line styles for clarity. This approach streamlines data processing by eliminating filename-based ID extraction and directly leveraging structured data matching.
 
 Running the code will yield this kind of graph:
 
