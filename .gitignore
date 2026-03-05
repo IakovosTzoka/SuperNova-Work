@@ -1,7 +1,21 @@
-.DS_Store
-cfg/nusperbin2d.root
-# ignore files in folders
-Build/*
+#Ignore Files in Folder 
 
-# but keep the folder
-!Build/.keep
+# Build Directory
+
+build/
+
+# Root outputs
+
+output/*.root
+
+#macOS junk
+
+.DS_Store
+
+# editor back files 
+
+*~
+*.log
+*.tmp
+__pycache__/
+

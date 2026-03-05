@@ -78,15 +78,15 @@ void AnalysisManager::Book(const std::string& file_path)
   }
 
   // check if metadata_ is a null pointer, if so, create metadata tree
-  if (metadata_ == 0)
-  {
-    metadata_ = new TTree("metadata", "metadata");
+  //if (metadata_ == 0)
+ // {
+   // metadata_ = new TTree("metadata", "metadata");
 
-    metadata_->Branch("detector_length_x", &detector_length_x_, "detector_length_x/D");
-    metadata_->Branch("detector_length_y", &detector_length_y_, "detector_length_y/D");
-    metadata_->Branch("detector_length_z", &detector_length_z_, "detector_length_z/D");
-    metadata_->Branch("use_HD_detector_configuration", &useHDDetectorConfiguration_);
-  }
+  //  metadata_->Branch("detector_length_x", &detector_length_x_, "detector_length_x/D");
+   // metadata_->Branch("detector_length_y", &detector_length_y_, "detector_length_y/D");
+   // metadata_->Branch("detector_length_z", &detector_length_z_, "detector_length_z/D");
+   // metadata_->Branch("use_HD_detector_configuration", &useHDDetectorConfiguration_);
+ // }
 
   // check if event_tree_ is a null pointer, if so, create event tree
   if (event_tree_ == 0) 
@@ -177,31 +177,31 @@ void AnalysisManager::Book(const std::string& file_path)
     event_tree_->Branch("hit_length",         &event.hit_length_);
 
       // Optical Tree
-      if(G4_Optical_tree_ == 0){
-          G4_Optical_tree_ = new TTree("G4_Photons", "Geant4 Photon Hit Information");
+    if(G4_Optical_tree_ == 0){
+    	G4_Optical_tree_ = new TTree("G4_Photons", "Geant4 Photon Hit Information");
           //G4_Optical_tree_->Branch("run",   &event.run_,   "run/I");
-          G4_Optical_tree_->Branch("event_id", &G4event_id);
-          G4_Optical_tree_->Branch("photon_hit_x",    &G4_photon_hit_x);
-          G4_Optical_tree_->Branch("photon_hit_y",    &G4_photon_hit_y);
-          G4_Optical_tree_->Branch("photon_hit_z",    &G4_photon_hit_z);
-          G4_Optical_tree_->Branch("photon_hit_t",    &G4_photon_hit_t);
-          G4_Optical_tree_->Branch("photon_hit_wavelength",    &G4_photon_hit_wavelength);
+        G4_Optical_tree_->Branch("event_id", &G4event_id);
+        G4_Optical_tree_->Branch("photon_hit_x",    &G4_photon_hit_x);
+        G4_Optical_tree_->Branch("photon_hit_y",    &G4_photon_hit_y);
+        G4_Optical_tree_->Branch("photon_hit_z",    &G4_photon_hit_z);
+        G4_Optical_tree_->Branch("photon_hit_t",    &G4_photon_hit_t);
+        G4_Optical_tree_->Branch("photon_hit_wavelength",    &G4_photon_hit_wavelength);
       }
-      /*
+      
 #ifdef With_Opticks
       // Opticks Tree
-      if(Opticks_Optical_tree_ == 0){
-          Opticks_Optical_tree_ = new TTree("Opticks_Photons", "Opticks Photon Hit Information");
+     if(Opticks_Optical_tree_ == 0){
+        Opticks_Optical_tree_ = new TTree("Opticks_Photons", "Opticks Photon Hit Information");
           //Opticks_Optical_tree_->Branch("run",   &event.run_,   "run/I");
-          Opticks_Optical_tree_->Branch("event_id", &Opticks_event_id);
-          Opticks_Optical_tree_->Branch("photon_hit_x",    &Opticks_photon_hit_x);
-          Opticks_Optical_tree_->Branch("photon_hit_y",    &Opticks_photon_hit_y);
-          Opticks_Optical_tree_->Branch("photon_hit_z",    &Opticks_photon_hit_z);
-          Opticks_Optical_tree_->Branch("photon_hit_t",    &Opticks_photon_hit_t);
-          Opticks_Optical_tree_->Branch("photon_hit_wavelength",    &Opticks_photon_hit_wavelength);
+        Opticks_Optical_tree_->Branch("event_id", &Opticks_event_id);
+        Opticks_Optical_tree_->Branch("photon_hit_x",    &Opticks_photon_hit_x);
+        Opticks_Optical_tree_->Branch("photon_hit_y",    &Opticks_photon_hit_y);
+        Opticks_Optical_tree_->Branch("photon_hit_z",    &Opticks_photon_hit_z);
+        Opticks_Optical_tree_->Branch("photon_hit_t",    &Opticks_photon_hit_t);
+        Opticks_Optical_tree_->Branch("photon_hit_wavelength",    &Opticks_photon_hit_wavelength);
       }
 #endif
-*/
+
   }
 }
 
@@ -218,7 +218,7 @@ void AnalysisManager::Reset() {
     G4_photon_hit_t.shrink_to_fit();
     G4_photon_hit_wavelength.clear();
     G4_photon_hit_wavelength.shrink_to_fit();
-/*
+
     Opticks_event_id.clear();
     Opticks_event_id.shrink_to_fit();
     Opticks_photon_hit_x.clear();
@@ -232,7 +232,7 @@ void AnalysisManager::Reset() {
     Opticks_photon_hit_t.shrink_to_fit();
     Opticks_photon_hit_wavelength.clear();
     Opticks_photon_hit_wavelength.shrink_to_fit();
-*/
+
 }
 
 //-----------------------------------------------------------------------------
@@ -240,15 +240,15 @@ void AnalysisManager::Save()
 {
   if (!G4Threading::IsMasterThread()) {return;}  // only run Save() with the master thread
 
-  //G4AutoLock saveLock(&saveMutex);
+  G4AutoLock saveLock(&saveMutex);
 
   // write TTree objects to file and close file
   tfile_->cd();
-  metadata_->Write();
- // event_tree_->Write();
+  //metadata_->Write();
+  event_tree_->Write();
   G4_Optical_tree_->Write();
 #ifdef With_Opticks
-  //Opticks_Optical_tree_->Write();
+  Opticks_Optical_tree_->Write();
 #endif
   tfile_->Close();
 
@@ -260,11 +260,11 @@ void AnalysisManager::EventFill(const AnalysisData& rhs)
   G4AutoLock fillLock(&fillMutex);
   // fill TTree objects per event
   event = rhs;
-  //event_tree_->Fill();
+  event_tree_->Fill();
   G4_Optical_tree_->Fill();
 #ifdef With_Opticks
 
-  // Opticks_Optical_tree_->Fill();
+  Opticks_Optical_tree_->Fill();
 #endif
   Reset();
 }
@@ -279,7 +279,7 @@ void AnalysisManager::FillMetadata()
   metadata_->Fill();
 }
 void AnalysisManager::AddG4PhotonHits(G4int eventID, double x ,double y, double z,double t, double wavelength ) {
-    //std::cout << "Saving Photon Info" << std::endl;
+  //  std::cout << "Saving Photon Info" << std::endl;
     G4AutoLock booklock(&bookMutex);
   // if (t/CLHEP::s > 10){  std::cout <<" Time " <<  t << " time/ns " << t/CLHEP::ns << " time/s " << t/CLHEP::s << std::endl };
        
@@ -289,7 +289,7 @@ void AnalysisManager::AddG4PhotonHits(G4int eventID, double x ,double y, double 
     G4_photon_hit_t.push_back(t);
     G4_photon_hit_wavelength.push_back(wavelength);
     G4event_id.push_back(eventID);
-   
+
 
 }
 
@@ -313,4 +313,3 @@ void AnalysisManager::AddOPhotonHits() {
     hits.shrink_to_fit();
 #endif
 }
-

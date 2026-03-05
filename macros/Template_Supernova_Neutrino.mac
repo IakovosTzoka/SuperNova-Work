@@ -7,7 +7,7 @@
 # configure marley for supernova
 /inputs/particle_type marley
 /inputs/generator marley
-/inputs/MARLEY_json ../cfg/marley_config_supernova.js
+/inputs/MARLEY_json ../cfg/config_Nakazato_No_Oscillations.js
 /inputs/isotropic false
 /inputs/override_vertex_position false
 /inputs/vertex_x 1.15 m
@@ -15,12 +15,12 @@
 /inputs/vertex_z 1.8 m
 
 # configure supernova timing
-/supernova/timing/on  false
-/inputs/input_file nusperbin2d_shifted2s.root #/n/holystore01/LABS/guenette_lab/Everyone/supernova/nusperbin2d.root
-/supernova/timing/th2_name  nusperbin2d_nue
+/supernova/timing/on  true
+/inputs/input_file supernova_data_Nakazato.root
+/supernova/timing/th2_name  h2d_Nakazato_No_Oscillations
 
 # output path
-/inputs/output_file test.root
+/inputs/output_file ../output/Nakazato_1000_events.root
 
 # initialize run
 /run/initialize
@@ -33,4 +33,5 @@
 #/grdm/nucleusLimits 1 35 1 17  # aMin aMax zMin zMax
 
 # run
-/run/beamOn 100
+/run/beamOn 1000
+
