@@ -272,11 +272,17 @@ void AnalysisManager::EventFill(const AnalysisData& rhs)
 void AnalysisManager::FillMetadata()
 {
   G4AutoLock metaLock(&metaMutex);
-  detector_length_x_ = ConfigManager::GetDetectorWidth();
-  detector_length_y_ = ConfigManager::GetDetectorHeight();
-  detector_length_z_ = ConfigManager::GetDetectorLength();
-  useHDDetectorConfiguration_ = ConfigManager::GetUseHDDetectorConfiguration();
-  metadata_->Fill();
+
+  if (metadata_) {
+    detector_length_x_ = ConfigManager::GetDetectorWidth();
+    detector_length_y_ = ConfigManager::GetDetectorHeight();
+    detector_length_z_ = ConfigManager::GetDetectorLength();
+    useHDDetectorConfiguration_ = ConfigManager::GetUseHDDetectorConfiguration();
+    metadata_->Fill();
+  }
+  else {
+    G4cout << "Error: metadata_ is a null pointer. Cannot fill metadata tree." << G4endl;
+  }
 }
 void AnalysisManager::AddG4PhotonHits(G4int eventID, double x ,double y, double z,double t, double wavelength ) {
   //  std::cout << "Saving Photon Info" << std::endl;

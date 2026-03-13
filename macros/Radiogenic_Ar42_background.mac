@@ -1,0 +1,33 @@
+
+# set verbosity
+/control/verbose 1
+/run/verbose 1
+/tracking/verbose 0
+/run/numberOfThreads 1
+
+
+# configure supernova
+/inputs/particle_type SUPERNOVA
+
+# output path
+/inputs/output_file ../output/radiogenic_Ar42_background.root
+
+# initialize run
+/random/setSeeds 137 100
+/run/initialize
+
+# event ID offset
+/event/offset 0
+
+# Supernova configs
+/supernova/Event_Window 10 s
+/supernova/Event_Cutoff 10 s
+
+/supernova/N_Ar42_Decays 1
+
+/process/had/rdm/nucleusLimits 42 42 18 18
+
+# run
+/run/beamOn 100
+
+
