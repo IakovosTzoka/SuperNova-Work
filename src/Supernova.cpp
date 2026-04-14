@@ -23,16 +23,6 @@
 
 //-----------------------------------------------------------------------------
 Supernova::Supernova()
-  : N_Ar39_Decays_(ConfigManager::GetNAr39Decays()),
-    N_Ar42_Decays_(ConfigManager::GetNAr42Decays()),
-    N_Kr85_Decays_(ConfigManager::GetNKr85Decays()),
-    N_Co60_Decays_(ConfigManager::GetNCo60Decays()),
-    N_K40_Decays_(ConfigManager::GetNK40Decays()),
-    N_K42_Decays_(ConfigManager::GetNK42Decays()),
-    N_Bi214_Decays_(ConfigManager::GetNBi214Decays()),
-    N_Pb214_Decays_(ConfigManager::GetNPb214Decays()),
-    N_Po210_Decays_(ConfigManager::GetNPo210Decays()),
-    N_Rn222_Decays_(ConfigManager::GetNRn222Decays())
 {
 }
 
@@ -45,6 +35,17 @@ Supernova::~Supernova()
 //-----------------------------------------------------------------------------
 void Supernova::Gen_Supernova_Background(G4Event* event)
 {
+    N_Ar39_Decays_ = ConfigManager::GetNAr39Decays();
+    N_Ar42_Decays_ = ConfigManager::GetNAr42Decays();
+    N_Kr85_Decays_ = ConfigManager::GetNKr85Decays();
+    N_Co60_Decays_ = ConfigManager::GetNCo60Decays();
+    N_K40_Decays_ =  ConfigManager::GetNK40Decays();
+    N_K42_Decays_ =  ConfigManager::GetNK42Decays();
+    N_Bi214_Decays_ = ConfigManager::GetNBi214Decays();
+    N_Pb214_Decays_ = ConfigManager::GetNPb214Decays();
+    N_Po210_Decays_ = ConfigManager::GetNPo210Decays();
+    N_Rn222_Decays_ = ConfigManager::GetNRn222Decays();
+
     // Generate Ar39
     for (int ct=0; ct<N_Ar39_Decays_; ct++)
     {

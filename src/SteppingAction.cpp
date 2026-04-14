@@ -35,11 +35,11 @@ SteppingAction::~SteppingAction()
 }
 
 
+// AFTER
 void SteppingAction::UserSteppingAction(const G4Step* step)
 {
     G4ParticleDefinition* pdef = step->GetTrack()->GetDefinition();
     G4Track* track = step->GetTrack();
-
 
     AnalysisManager::Instance();
 
@@ -49,22 +49,8 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
       event.AddProcess("User Limit");
     }
 
-    static G4OpBoundaryProcess* boundary = 0;
-
-    if (!boundary) { // the pointer is not defined yet
-        // Get the list of processes defined for the optical photon
-        // and loop through it to find the optical boundary process.
-        G4ProcessVector* pv = pdef->GetProcessManager()->GetProcessList();
-        for (size_t i=0; i<pv->size(); i++) {
-            if ((*pv)[i]->GetProcessName() == "OpBoundary") {
-                boundary = (G4OpBoundaryProcess*) (*pv)[i];
-                break;
-            }
-        }
-    }
-
-
     if (pdef != G4OpticalPhoton::Definition()) {
+        // ---- non-photon branch: Opticks genstep collection, unchanged ----
         G4SteppingManager *sMg = G4EventManager::GetEventManager()->GetTrackingManager()->GetSteppingManager();
         G4StepStatus stepStatus = sMg->GetfStepStatus();
         if (stepStatus != fAtRestDoItProc) {
@@ -74,8 +60,6 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
                 if ((*PostStepProc)[stp]->GetProcessName() == "Scintillation") {
                     G4Scintillation *ScintProc = (G4Scintillation *) (*PostStepProc)[stp];
                     G4int num_photons = ScintProc->GetNumPhotons();
-                    //std::cout << "Scintilation "<< num_photons <<std::endl;
-
                     if (num_photons > 0) {
                         G4MaterialPropertiesTable *MPT = track->GetMaterial()->GetMaterialPropertiesTable();
                         G4double t1, t2 = 0;
@@ -84,42 +68,43 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
                         t2 = MPT->GetConstProperty(kSCINTILLATIONTIMECONSTANT2);
                         singlets = floor(MPT->GetConstProperty(kSCINTILLATIONYIELD1) * num_photons);
                         triplets = ceil(MPT->GetConstProperty(kSCINTILLATIONYIELD2) * num_photons);
-
-
-                        //std::cout << "Scintilation "<< num_photons <<" Amount of Singlets " <<singlets <<" Triplets " << triplets <<std::endl;
 #ifdef With_Opticks
                         if (singlets > 0)
                             U4::CollectGenstep_DsG4Scintillation_r4695(track, step, singlets, 0, t1);
                         if (triplets > 0)
                             U4::CollectGenstep_DsG4Scintillation_r4695(track, step, triplets, 1, t2);
 #endif
-
                     }
-
                 }
             }
         }
-    }
+    } else {
+        // ---- optical photon branch ----
+        // Initialize boundary pointer exactly once, from the photon's own process list
+        static G4OpBoundaryProcess* boundary = nullptr;
+        if (!boundary) {
+            G4ProcessVector* pv = pdef->GetProcessManager()->GetProcessList();
+            for (size_t i = 0; i < pv->size(); i++) {
+                if ((*pv)[i]->GetProcessName() == "OpBoundary") {
+                    boundary = (G4OpBoundaryProcess*) (*pv)[i];
+                    break;
+                }
+            }
+        }
 
-    if (step->GetPostStepPoint()->GetStepStatus() == fGeomBoundary) {
-        if (boundary->GetStatus() == Detection ){
-            G4String detector_name = step->GetPostStepPoint()->GetTouchableHandle()->GetVolume()->GetName();
-            // Only care about optical photons
-                auto run= G4RunManager::GetRunManager();
-                G4int eventID=run->GetCurrentEvent()->GetEventID();
-                if(pdef->GetParticleName()!="opticalphoton") return;
-                // Get the name of the volume where the track ended
-                G4String volName = track->GetStep()->GetPostStepPoint()->GetTouchableHandle()->GetVolume()->GetName();
-
-                // Check if it died in the silicon detector
-                G4ThreeVector pos = track->GetStep()->GetPostStepPoint()->GetPosition();
-                G4double time = track->GetStep()->GetPostStepPoint()->GetGlobalTime();
-                G4double wavelength=1239.8/step->GetPostStepPoint()->GetTotalEnergy()*CLHEP::eV; //nm
-                AnalysisManager * analysisManager = AnalysisManager::Instance();
-		analysisManager->AddG4PhotonHits(eventID , pos.x() / CLHEP::cm, pos.y() / CLHEP::cm,pos.z() / CLHEP::cm,time / CLHEP::ns,wavelength);
-
-
+        if (boundary &&
+            step->GetPostStepPoint()->GetStepStatus() == fGeomBoundary &&
+            boundary->GetStatus() == Detection)
+        {
+            auto run = G4RunManager::GetRunManager();
+            G4int eventID = run->GetCurrentEvent()->GetEventID();
+            G4ThreeVector pos = track->GetStep()->GetPostStepPoint()->GetPosition();
+            G4double time     = track->GetStep()->GetPostStepPoint()->GetGlobalTime();
+            G4double wavelength = 1239.8 / step->GetPostStepPoint()->GetTotalEnergy() * CLHEP::eV;
+            AnalysisManager::Instance()->AddG4PhotonHits(
+                eventID,
+                pos.x() / CLHEP::cm, pos.y() / CLHEP::cm, pos.z() / CLHEP::cm,
+                time / CLHEP::ns, wavelength);
         }
     }
-
 }
