@@ -103,9 +103,24 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   new G4PVPlacement(0, G4ThreeVector(0,0.,325*CLHEP::cm/2),
                     Photon_detector_logic_vol, "Photon_detector.physical", detector_logic_vol, false, 0, true);
   //////////////////////////////////////////////////////////
-G4OpticalSurface * ops= new G4OpticalSurface("SiliconeDetector",unified,polished,dielectric_metal);
+
+
+//#G4OpticalSurface * ops= new G4OpticalSurface("SiliconeDetector",unified,polished,dielectric_metal);
+//ops->SetMaterialPropertiesTable(OpticalMaterialProperties::PerfectDetector());
+//G4LogicalSkinSurface * lss = new G4LogicalSkinSurface("SiliconeDetector",detector_logic_vol,ops);
+
+G4VPhysicalVolume* detector_phys_vol =
+    new G4PVPlacement(0, offset,
+                      detector_logic_vol, "detector.physical", world_logic_vol, false, 0, true);
+
+G4VPhysicalVolume* photon_detector_phys_vol =
+    new G4PVPlacement(0, G4ThreeVector(0, 0., 325*CLHEP::cm/2),
+                      Photon_detector_logic_vol, "Photon_detector.physical", detector_logic_vol, false, 0, true);
+
+// Border surface: only fires when photon crosses LAr → Silicon boundary
+G4OpticalSurface* ops = new G4OpticalSurface("SiliconeDetector", unified, polished, dielectric_metal);
 ops->SetMaterialPropertiesTable(OpticalMaterialProperties::PerfectDetector());
-G4LogicalSkinSurface * lss = new G4LogicalSkinSurface("SiliconeDetector",detector_logic_vol,ops);
+new G4LogicalBorderSurface("SiliconeDetector", detector_phys_vol, photon_detector_phys_vol, ops);
 
 
 #ifdef With_Opticks

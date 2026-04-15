@@ -95,7 +95,8 @@ double SupernovaTiming::Sample(double const energy)
     int const bin_idx = th1_->FindBin(energy);  // energy in MeV
 
     // get time distribution of energy bin
-    TH1D * th1_time = th2_->ProjectionX("time", bin_idx, bin_idx+1);  // sec
+    //TH1D * th1_time = th2_->ProjectionX("time", bin_idx, bin_idx+1);  // sec
+    TH1D * th1_time = th2_->ProjectionX("time", bin_idx, bin_idx);
 
     // sample from time distribution
     double const time = th1_time->GetRandom();  // sec

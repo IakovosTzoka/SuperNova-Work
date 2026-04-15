@@ -35,7 +35,6 @@ SteppingAction::~SteppingAction()
 }
 
 
-// AFTER
 void SteppingAction::UserSteppingAction(const G4Step* step)
 {
     G4ParticleDefinition* pdef = step->GetTrack()->GetDefinition();
