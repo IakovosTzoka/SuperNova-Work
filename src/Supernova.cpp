@@ -45,6 +45,8 @@ void Supernova::Gen_Supernova_Background(G4Event* event)
     N_Pb214_Decays_ = ConfigManager::GetNPb214Decays();
     N_Po210_Decays_ = ConfigManager::GetNPo210Decays();
     N_Rn222_Decays_ = ConfigManager::GetNRn222Decays();
+    N_Rn220_Decays_ = ConfigManager::GetNRn220Decays();
+    N_Rn219_Decays_ = ConfigManager::GetNRn219Decays();
 
     // Generate Ar39
     for (int ct=0; ct<N_Ar39_Decays_; ct++)
@@ -126,6 +128,23 @@ void Supernova::Gen_Supernova_Background(G4Event* event)
         decay_time = G4UniformRand() * Event_Window_;
         if (G4UniformRand() < 0.5){decay_time *= -1.0;}
         Generate_Radioisotope(event, 86, 222, decay_time, "Vol"); //Rn222 from Volume
+    }
+
+        // Generate Rn220
+    for (int ct=0; ct<N_Rn220_Decays_; ct++)
+    {
+        decay_time = G4UniformRand() * Event_Window_;
+        if (G4UniformRand() < 0.5){decay_time *= -1.0;}
+        Generate_Radioisotope(event, 86, 220, decay_time, "Vol"); //Rn220 from Volume
+    }
+
+
+        // Generate Rn219
+    for (int ct=0; ct<N_Rn219_Decays_; ct++)
+    {
+        decay_time = G4UniformRand() * Event_Window_;
+        if (G4UniformRand() < 0.5){decay_time *= -1.0;}
+        Generate_Radioisotope(event, 86, 219, decay_time, "Vol"); //Rn219 from Volume
     }
 
 }

@@ -48,7 +48,7 @@ ConfigManager::ConfigManager()
   overrideVertexPosition_(false), printParticleInfo_(false), inputFile_(""), outputFile_(""), marleyJson_(""), generator_(""),
   genieFormat_(""), multirun_(false), momentumDirection_(0,0,0), vertexX_(2.3*CLHEP::m/2), vertexY_(6.0*CLHEP::m/2), vertexZ_(3.7*CLHEP::m/2),
   nAr39Decays_(0), nAr42Decays_(0), nKr85Decays_(0), nCo60Decays_(0), nK40Decays_(0),
-  nK42Decays_(0), nBi214Decays_(0), nPb214Decays_(0), nPo210Decays_(0), nRn222Decays_(0), eventCutoff_(0),
+  nK42Decays_(0), nBi214Decays_(0), nPb214Decays_(0), nPo210Decays_(0), nRn222Decays_(0), nRn220Decays_(0), nRn219Decays_(0),eventCutoff_(0),
   eventWindow_(0),
   snTimingOn_(false), th2Name_("nusperbin2d_nue"),
   useHDDetectorConfiguration_(true), detectorLength_(0), detectorWidth_(0), detectorHeight_(0)
@@ -74,6 +74,7 @@ ConfigManager::ConfigManager(const ConfigManager& master)
   nK40Decays_(master.nK40Decays_), nK42Decays_(master.nK42Decays_),
   nBi214Decays_(master.nBi214Decays_), nPb214Decays_(master.nPb214Decays_),
   nPo210Decays_(master.nPo210Decays_), nRn222Decays_(master.nRn222Decays_),
+  nRn220Decays_(master.nRn220Decays_), nRn219Decays_(master.nRn219Decays_),
   eventCutoff_(master.eventCutoff_), eventWindow_(master.eventWindow_),
   snTimingOn_(master.snTimingOn_), th2Name_(master.th2Name_),
   useHDDetectorConfiguration_(master.useHDDetectorConfiguration_), detectorLength_(master.detectorLength_),
@@ -135,6 +136,8 @@ void ConfigManager::CreateCommands()
   msgSupernova_->DeclareProperty("N_Pb214_Decays", nPb214Decays_,  "number of Pb214 decays");
   msgSupernova_->DeclareProperty("N_Po210_Decays", nPo210Decays_,  "number of Po210 decays");
   msgSupernova_->DeclareProperty("N_Rn222_Decays", nRn222Decays_,  "number of Rn222 decays");
+  msgSupernova_->DeclareProperty("N_Rn220_Decays", nRn220Decays_,  "number of Rn220 decays");
+  msgSupernova_->DeclareProperty("N_Rn219_Decays", nRn219Decays_,  "number of Rn219 decays");
 
   msgSupernova_->DeclarePropertyWithUnit("Event_Cutoff", "ns", eventCutoff_,  "window to simulate the times");
   msgSupernova_->DeclarePropertyWithUnit("Event_Window", "ns", eventWindow_,  "window to simulate the times");
@@ -182,6 +185,8 @@ void ConfigManager::PrintConfig() const
      << "Supernova -- N_Pb214_Decays: " << nPb214Decays_ << G4endl
      << "Supernova -- N_Po210_Decays: " << nPo210Decays_ << G4endl
      << "Supernova -- N_Rn222_Decays: " << nRn222Decays_ << G4endl
+     << "Supernova -- N_Rn220_Decays: " << nRn220Decays_ << G4endl
+     << "Supernova -- N_Rn219_Decays: " << nRn219Decays_ << G4endl
      << "Supernova -- Event_Cutoff:   " << eventCutoff_/CLHEP::ns << " ns" << G4endl
      << "Supernova -- Event_Window:   " << eventWindow_/CLHEP::ns << " ns" << G4endl
      << G4endl

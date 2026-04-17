@@ -38,6 +38,8 @@ class Supernova {
         int N_Pb214_Decays_;
         int N_Po210_Decays_;
         int N_Rn222_Decays_;
+        int N_Rn220_Decays_;
+        int N_Rn219_Decays_;
 
         double decay_time;
         

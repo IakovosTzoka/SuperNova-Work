@@ -16,9 +16,7 @@
 // Geant Includes
 #include "G4Types.hh"
 #include "G4String.hh"
-#include "G4ThreeVector.hh"
-
-// System Includes
+#include "G4ThreeVector.hh"// System Includes
 
 // Forward Declarations
 class G4GenericMessenger;
@@ -65,6 +63,8 @@ class ConfigManager {
     static G4int         GetNPb214Decays()                  { return Instance()->nPb214Decays_; }
     static G4int         GetNPo210Decays()                  { return Instance()->nPo210Decays_; }
     static G4int         GetNRn222Decays()                  { return Instance()->nRn222Decays_; }
+    static G4int         GetNRn220Decays()                  { return Instance()->nRn220Decays_; }
+    static G4int         GetNRn219Decays()                  { return Instance()->nRn219Decays_; }
     static G4double      GetEventCutoff()                   { return Instance()->eventCutoff_; }
     static G4double      GetEventWindow()                   { return Instance()->eventWindow_; }
     static G4bool        GetSNTimingOn()                    { return Instance()->snTimingOn_; }
@@ -102,6 +102,8 @@ class ConfigManager {
     static void SetNPb214Decays(G4int value)                { Instance()->nPb214Decays_ = value; }
     static void SetNPo210Decays(G4int value)                { Instance()->nPo210Decays_ = value; }
     static void SetNRn222Decays(G4int value)                { Instance()->nRn222Decays_ = value; }
+    static void SetNRn220Decays(G4int value)                { Instance()->nRn220Decays_ = value; }
+    static void SetNRn219Decays(G4int value)                { Instance()->nRn219Decays_ = value; }
     static void SetEventCutoff(G4double value)              { Instance()->eventCutoff_ = value; }
     static void SetEventWindow(G4double value)              { Instance()->eventWindow_ = value; }
     static void SetSNTimingOn(G4bool value)                 { Instance()->snTimingOn_ = value; }
@@ -157,6 +159,8 @@ class ConfigManager {
     G4int         nPb214Decays_;
     G4int         nPo210Decays_;
     G4int         nRn222Decays_;
+    G4int         nRn220Decays_;
+    G4int         nRn219Decays_;
     G4double      eventCutoff_;
     G4double      eventWindow_;
 
