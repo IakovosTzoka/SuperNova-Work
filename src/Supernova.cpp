@@ -35,6 +35,8 @@ Supernova::~Supernova()
 //-----------------------------------------------------------------------------
 void Supernova::Gen_Supernova_Background(G4Event* event)
 {
+    Event_Window_ = ConfigManager::GetEventWindow();
+
     N_Ar39_Decays_ = ConfigManager::GetNAr39Decays();
     N_Ar42_Decays_ = ConfigManager::GetNAr42Decays();
     N_Kr85_Decays_ = ConfigManager::GetNKr85Decays();
@@ -70,7 +72,6 @@ void Supernova::Gen_Supernova_Background(G4Event* event)
     {
         decay_time = G4UniformRand() * Event_Window_;
         if (G4UniformRand() < 0.5){decay_time *= -1.0;}
-
         Generate_Radioisotope(event, 36, 85, decay_time, "Vol"); //Kr85 from Volume
     }
 
