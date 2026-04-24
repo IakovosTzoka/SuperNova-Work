@@ -1,8 +1,0 @@
-Nakaxato and Bollig need to be run again with the new configuration. 
-
-Sukhbold Normal Hierarchy needs to be ran again because of a weird corruption on the root file.
-
-I need to run the QPiXSemiAnalytical model for all of them.
-
-
-Things to consider for another day...
