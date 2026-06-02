@@ -46,7 +46,7 @@ ConfigManager::ConfigManager()
   : eventIDOffset_(0), energyThreshold_(0),
   particleType_(""), decayAtTimeZero_(false), isotropic_(true),
   overrideVertexPosition_(false), printParticleInfo_(false), inputFile_(""), outputFile_(""), marleyJson_(""), generator_(""),
-  genieFormat_(""), multirun_(false), momentumDirection_(0,0,0), vertexX_(2.3*CLHEP::m/2), vertexY_(6.0*CLHEP::m/2), vertexZ_(3.7*CLHEP::m/2),
+  genieFormat_(""), multirun_(false), semiAnalyticalOutput_(false), momentumDirection_(0,0,0), vertexX_(2.3*CLHEP::m/2), vertexY_(6.0*CLHEP::m/2), vertexZ_(3.7*CLHEP::m/2),
   nAr39Decays_(0), nAr42Decays_(0), nKr85Decays_(0), nCo60Decays_(0), nK40Decays_(0),
   nK42Decays_(0), nBi214Decays_(0), nPb214Decays_(0), nPo210Decays_(0), nRn222Decays_(0), nRn220Decays_(0), nRn219Decays_(0),eventCutoff_(0),
   eventWindow_(0),
@@ -66,7 +66,7 @@ ConfigManager::ConfigManager(const ConfigManager& master)
   printParticleInfo_(master.printParticleInfo_), inputFile_(master.inputFile_),
   outputFile_(master.outputFile_), marleyJson_(master.marleyJson_),
   generator_(master.generator_), genieFormat_(master.genieFormat_),
-  multirun_(master.multirun_), momentumDirection_(master.momentumDirection_),
+  multirun_(master.multirun_), semiAnalyticalOutput_(master.semiAnalyticalOutput_), momentumDirection_(master.momentumDirection_),
   vertexX_(master.vertexX_), vertexY_(master.vertexY_),
   vertexZ_(master.vertexZ_),
   nAr39Decays_(master.nAr39Decays_), nAr42Decays_(master.nAr42Decays_),
@@ -118,6 +118,7 @@ void ConfigManager::CreateCommands()
   msgInputs_->DeclareProperty("MARLEY_json", marleyJson_, "marley config json file");
   msgInputs_->DeclareProperty("generator", generator_, "event generator of input file");
   msgInputs_->DeclareProperty("multirun", multirun_, "multiple runs");
+  msgInputs_->DeclareProperty("semi_analytical_output", semiAnalyticalOutput_, "Only write branches needed by the semi-analytical workflow.");
   msgInputs_->DeclareProperty("genie_format", genieFormat_, "format of genie-produced input file");
   msgInputs_->DeclareProperty("momentum_direction", momentumDirection_, "initial momentum of generator particles");
 
@@ -174,6 +175,7 @@ void ConfigManager::PrintConfig() const
      << "Input -- Vertex_Y:                 " << vertexY_/CLHEP::mm << " mm" <<  G4endl
      << "Input -- Vertex_Z:                 " << vertexZ_/CLHEP::mm << " mm" << G4endl
      << "Input -- Multirun:                 " << multirun_ << G4endl
+     << "Input -- Semi_Analytical_Output:   " << semiAnalyticalOutput_ << G4endl
      << G4endl
      << "Supernova -- N_Ar39_Decays:  " << nAr39Decays_ << G4endl
      << "Supernova -- N_Ar42_Decays:  " << nAr42Decays_ << G4endl

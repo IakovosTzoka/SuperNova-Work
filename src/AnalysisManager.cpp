@@ -78,22 +78,26 @@ void AnalysisManager::Book(const std::string& file_path)
   }
 
   // check if metadata_ is a null pointer, if so, create metadata tree
-  //if (metadata_ == 0)
- // {
-   // metadata_ = new TTree("metadata", "metadata");
+  if (metadata_ == 0)
+  {
+    metadata_ = new TTree("metadata", "metadata");
 
-  //  metadata_->Branch("detector_length_x", &detector_length_x_, "detector_length_x/D");
-   // metadata_->Branch("detector_length_y", &detector_length_y_, "detector_length_y/D");
-   // metadata_->Branch("detector_length_z", &detector_length_z_, "detector_length_z/D");
-   // metadata_->Branch("use_HD_detector_configuration", &useHDDetectorConfiguration_);
- // }
+    metadata_->Branch("detector_length_x", &detector_length_x_, "detector_length_x/D");
+    metadata_->Branch("detector_length_y", &detector_length_y_, "detector_length_y/D");
+    metadata_->Branch("detector_length_z", &detector_length_z_, "detector_length_z/D");
+    metadata_->Branch("use_HD_detector_configuration", &useHDDetectorConfiguration_);
+  }
 
   // check if event_tree_ is a null pointer, if so, create event tree
   if (event_tree_ == 0) 
   {
+    const G4bool semiAnalyticalOutput = ConfigManager::GetSemiAnalyticalOutput();
+
     event_tree_ = new TTree("event_tree", "event tree");
 
     event_tree_->Branch("run",   &event.run_,   "run/I");
+
+    if (!semiAnalyticalOutput) {
     event_tree_->Branch("event", &event.event_, "event/I");
 
     event_tree_->Branch("generator_initial_number_particles",  &event.generator_initial_number_particles_, "generator_initial_number_particles/I");
@@ -165,13 +169,14 @@ void AnalysisManager::Book(const std::string& file_path)
 
     event_tree_->Branch("hit_track_id",       &event.hit_track_id_);
     event_tree_->Branch("hit_pdg_code",       &event.hit_pdg_code_);
+    }
     event_tree_->Branch("hit_start_x",        &event.hit_start_x_);
-    event_tree_->Branch("hit_start_y",        &event.hit_start_y_);
-    event_tree_->Branch("hit_start_z",        &event.hit_start_z_);
-    event_tree_->Branch("hit_start_t",        &event.hit_start_t_);
     event_tree_->Branch("hit_end_x",          &event.hit_end_x_);
+    event_tree_->Branch("hit_start_y",        &event.hit_start_y_);
     event_tree_->Branch("hit_end_y",          &event.hit_end_y_);
+    event_tree_->Branch("hit_start_z",        &event.hit_start_z_);
     event_tree_->Branch("hit_end_z",          &event.hit_end_z_);
+    event_tree_->Branch("hit_start_t",        &event.hit_start_t_);
     event_tree_->Branch("hit_end_t",          &event.hit_end_t_);
     event_tree_->Branch("hit_energy_deposit", &event.hit_energy_deposit_);
     event_tree_->Branch("hit_length",         &event.hit_length_);
@@ -244,7 +249,7 @@ void AnalysisManager::Save()
 
   // write TTree objects to file and close file
   tfile_->cd();
-  //metadata_->Write();
+  metadata_->Write();
   event_tree_->Write();
   G4_Optical_tree_->Write();
 #ifdef With_Opticks

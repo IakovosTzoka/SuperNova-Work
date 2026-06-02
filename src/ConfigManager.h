@@ -49,6 +49,7 @@ class ConfigManager {
     static G4String      GetGenerator()                     { return Instance()->generator_; }
     static G4String      GetGenieFormat()                   { return Instance()->genieFormat_; }
     static G4bool        GetMultirun()                      { return Instance()->multirun_; }
+    static G4bool        GetSemiAnalyticalOutput()          { return Instance()->semiAnalyticalOutput_; }
     static G4ThreeVector GetMomentumDirection()             { return Instance()->momentumDirection_; }
     static G4double      GetVertexX()                       { return Instance()->vertexX_; }
     static G4double      GetVertexY()                       { return Instance()->vertexY_; }
@@ -88,6 +89,7 @@ class ConfigManager {
     static void SetGenerator(G4String value)                { Instance()->generator_ = value; }
     static void SetGenieFormat(G4String value)              { Instance()->genieFormat_ = value; }
     static void SetMultirun(G4bool value)                   { Instance()->multirun_ = value; }
+    static void SetSemiAnalyticalOutput(G4bool value)       { Instance()->semiAnalyticalOutput_ = value; }
     static void SetMomentumDirection(G4ThreeVector value)   { Instance()->momentumDirection_ = value; }
     static void SetVertexX(G4double value)                  { Instance()->vertexX_ = value; }
     static void SetVertexY(G4double value)                  { Instance()->vertexY_ = value; }
@@ -143,6 +145,7 @@ class ConfigManager {
     G4String      generator_;
     G4String      genieFormat_;
     G4bool        multirun_;
+    G4bool        semiAnalyticalOutput_;
     G4ThreeVector momentumDirection_;
     G4double      vertexX_;
     G4double      vertexY_;
