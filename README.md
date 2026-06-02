@@ -86,7 +86,7 @@ Example macro fragment:
 Current Mac/Apple Silicon build usage:
 
 ```bash
-cd /Users/jacob/Programs/Library/SuperNova-Work
+cd $HOME/Programs/Library/SuperNova-Work
 cmake -S . -B build -DWith_Opticks=OFF -DWITH_GEANT4_UIVIS=OFF
 cmake --build build --parallel 1
 cd macros
@@ -113,3 +113,339 @@ Implementation details for the flag:
 - `src/AnalysisManager.cpp:100` starts the `if (!semiAnalyticalOutput)` block that keeps the full-output-only branches out of slim mode.
 - `src/AnalysisManager.cpp:173-182` always books the semi-analytical hit branches, so they are present in both full and slim output modes.
 - `src/AnalysisManager.cpp:184` continues into the optical photon tree booking, so `G4_Photons` is still saved in slim mode.
+
+## Addendum: macOS Install Notes Through SuperNova
+
+This addendum is adapted from `README_QPIX_MAC_INSTALL.md` through the Q-Pix Geant4/SuperNova build section, stopping before `Q_PIX_RTD`. It is intended for running `SuperNova-Work` on macOS/Apple Silicon without Opticks.
+
+Important version note: the GitHub/Linux installation path is set up around Geant4 11.1.1. That newer Geant4 stack is the path to keep in mind if Opticks support is added later, because Opticks requires CUDA and is not usable on Apple Silicon. The macOS setup below uses Geant4 10.7.4 as the local batch-mode, non-Opticks build that works on this machine.
+
+### 1. Create The Workspace
+
+```sh
+cd
+mkdir -p Programs/Library
+cd Programs/Library
+```
+
+Use `$HOME/Programs/Library` as the Mac replacement for the Linux `$HOME/Programs` workspace.
+
+### 2. Base Dependencies
+
+On Ubuntu the install uses `apt`. On macOS, install the equivalent build tools with Homebrew:
+
+```sh
+brew install cmake gcc gfortran gawk git autoconf automake libtool
+brew install boost gsl libxml2 log4cpp pcre qt@5 tbb xerces-c nlohmann-json wget
+brew install root
+```
+
+If Homebrew already has a package installed, leave it alone. Do not build a second copy unless a special version is required.
+
+### 3. LHAPDF5
+
+Use the same LHAPDF 5 tarball, but keep the install under the Mac workspace:
+
+```sh
+cd $HOME/Programs/Library
+tar -xvzf $HOME/Downloads/lhapdf-5.9.1.tar.gz
+cd lhapdf-5.9.1
+```
+
+Mac-specific change:
+
+```sh
+export FCFLAGS="-std=legacy"
+```
+
+Configure against a local prefix:
+
+```sh
+./configure --disable-pyext --disable-octave --prefix=$HOME/Library/TMP
+make
+make install
+```
+
+If the prefix has old root-owned files, fix ownership before installing:
+
+```sh
+sudo chown -R "$(whoami)" $HOME/Library/TMP
+```
+
+### 4. PYTHIA6
+
+Use the PYTHIA 6.428 source file and place it in the Mac workspace:
+
+```sh
+cd $HOME/Programs/Library
+mkdir -p pythia6
+cd pythia6
+```
+
+Create `pythia6428.f` from the downloaded file.
+
+Then build it through GENIE's helper script. On macOS the script needed this patch first:
+
+```diff
+- gcc -o fsplit fsplit.c
++ gcc -std=gnu89 -o fsplit fsplit.c
+```
+
+Then run:
+
+```sh
+cd $HOME/Programs/Library/GENIE/Generator/src/scripts/build/ext
+source ./build_pythia6.sh clean
+```
+
+The expected result is:
+
+```sh
+$HOME/Programs/Library/pythia6/v6_428/lib/libPythia6.dylib
+```
+
+### 5. ROOT
+
+On this Mac, Homebrew ROOT was used instead of a separate source build tree.
+
+Use this path in the rest of the notes:
+
+```sh
+/opt/homebrew/Cellar/root/6.38.00
+```
+
+That means this Linux line:
+
+```sh
+export ROOTSYS=$HOME/Programs/root_build/
+```
+
+becomes:
+
+```sh
+export ROOTSYS=/opt/homebrew/Cellar/root/6.38.00
+```
+
+The usual ROOT setup still applies:
+
+```sh
+source $ROOTSYS/bin/thisroot.sh
+```
+
+Because ROOT 6.38 no longer ships the old `TPythia6` support GENIE expects, a small compatibility library from ROOT 6.26 `montecarlo/pythia6` was built here:
+
+```sh
+$HOME/Programs/Library/root-egpythia6-compat/install
+```
+
+### 6. GENIE
+
+Clone GENIE into the Mac workspace:
+
+```sh
+cd $HOME/Programs/Library
+mkdir -p GENIE
+cd GENIE
+git clone --branch R-3_02_00 https://github.com/GENIE-MC/Generator.git
+```
+
+Mac-specific files that needed changes:
+
+```txt
+GENIE/Generator/configure
+GENIE/Generator/src/make/Make.include
+GENIE/Generator/src/Physics/HadronTransport/INukeNucleonCorr.cxx
+```
+
+The important substitutions are:
+
+```txt
+- use Homebrew ROOT instead of a local ROOT source build
+- link against $HOME/Programs/Library/root-egpythia6-compat/install
+- keep the build serial; do not use make -j8 for GENIE
+```
+
+The configure line that worked on this Mac was:
+
+```sh
+cd $HOME/Programs/Library/GENIE/Generator
+./configure \
+  --enable-lhapdf5 \
+  --enable-fnal \
+  --enable-nucleon-decay \
+  --enable-atmo \
+  --enable-test \
+  --enable-gfortran \
+  --with-compiler=clang \
+  --with-pythia6-lib=$HOME/Programs/Library/pythia6/v6_428/lib \
+  --with-lhapdf5-inc=$HOME/Library/TMP/include \
+  --with-lhapdf5-lib=$HOME/Library/TMP/lib \
+  --with-log4cpp-inc=/opt/homebrew/opt/log4cpp/include \
+  --with-log4cpp-lib=/opt/homebrew/opt/log4cpp/lib \
+  --with-libxml2-inc=/opt/homebrew/opt/libxml2/include/libxml2 \
+  --with-libxml2-lib=/opt/homebrew/opt/libxml2/lib \
+  --with-gfortran-lib=/opt/homebrew/opt/gcc/lib/gcc/current
+make
+```
+
+Verification:
+
+```sh
+gmkspl --help
+```
+
+If it prints usage text and exits with a usage error, GENIE is alive.
+
+### 7. Geant4 10.7.4
+
+The Linux notes use `apt`. On macOS, use Homebrew Qt and X11 dependencies instead:
+
+```sh
+brew install qt@5 xerces-c libxml2
+```
+
+Download and unpack Geant4:
+
+```sh
+cd $HOME/Programs/Library
+wget https://gitlab.cern.ch/geant4/geant4/-/archive/v10.7.4/geant4-v10.7.4.tar.gz
+tar -xzvf geant4-v10.7.4.tar.gz
+```
+
+Configure:
+
+```sh
+cd $HOME/Programs/Library/geant4-v10.7.4
+mkdir geant4.10.7.4-build geant4.10.7.4-install
+cmake -S . -B geant4.10.7.4-build \
+  -DCMAKE_INSTALL_PREFIX=$HOME/Programs/Library/geant4-v10.7.4/geant4.10.7.4-install \
+  -DCMAKE_PREFIX_PATH=/opt/homebrew/opt/qt@5 \
+  -DGEANT4_INSTALL_DATA=ON \
+  -DGEANT4_USE_GDML=ON \
+  -DGEANT4_USE_QT=ON \
+  -DGEANT4_USE_RAYTRACER_X11=ON \
+  -DGEANT4_USE_OPENGL_X11=ON \
+  -DGEANT4_BUILD_MULTITHREADED=ON \
+  -DGEANT4_USE_SYSTEM_ZLIB=ON
+```
+
+Patch needed for the current compiler:
+
+```diff
+- ,m_branch(a_from.m_barnch)
++ ,m_branch(a_from.m_branch)
+```
+
+File:
+
+```txt
+geant4-v10.7.4/source/analysis/g4tools/include/tools/wroot/columns.icc
+```
+
+Build and install:
+
+```sh
+cmake --build $HOME/Programs/Library/geant4-v10.7.4/geant4.10.7.4-build --target install -j8
+```
+
+Geant4 on this Mac needs one extra fix before SuperNova can configure:
+
+```sh
+mv $HOME/Programs/Library/geant4-v10.7.4/geant4.10.7.4-install/lib/Geant4-10.7.4/Geant4PackageCache.cmake \
+   $HOME/Programs/Library/geant4-v10.7.4/geant4.10.7.4-install/lib/Geant4-10.7.4/Geant4PackageCache.cmake.disabled
+```
+
+Geant4 10.7.4 also needs two source edits in `SuperNova-Work` that are not required on newer Geant4 releases:
+
+- In `src/RunAction.cpp`, replace `G4StrUtil::to_lower(...)` with standard C++ lowercase conversion.
+- In `src/OpticalMaterialProperties.cpp`, remove the trailing `true` argument from `AddProperty(...)` and `AddConstProperty(...)` calls, because the 10.7.4 `G4MaterialPropertiesTable` signatures do not accept it.
+
+Verification:
+
+```sh
+cd $HOME/Programs/Library/geant4-v10.7.4/geant4.10.7.4-install/bin
+source ./geant4.sh
+geant4-config --version
+```
+
+Expected:
+
+```txt
+10.7.4
+```
+
+### 8. MARLEY
+
+Clone and build:
+
+```sh
+cd $HOME/Programs/Library
+git clone https://github.com/MARLEY-MC/marley.git
+cd marley
+make -C build all
+```
+
+Mac-specific change to `setup_marley.sh`:
+
+```sh
+# For building against MARLEY
+export CPLUS_INCLUDE_PATH=${CPLUS_INCLUDE_PATH}:${THIS_DIRECTORY}/include
+export LIBRARY_PATH=${LIBRARY_PATH}:${THIS_DIRECTORY}/build
+```
+
+That is enough to make the Mac build and ROOT integration work.
+
+### 9. SuperNova-Work
+
+Clone or enter this repository:
+
+```sh
+cd $HOME/Programs/Library
+git clone https://github.com/IakovosTzoka/SuperNova-Work.git
+cd SuperNova-Work
+```
+
+For the Mac/Apple Silicon, non-Opticks build, configure with Opticks and UI/VIS disabled:
+
+```sh
+cmake -S . -B build \
+  -DWith_Opticks=OFF \
+  -DWITH_GEANT4_UIVIS=OFF
+```
+
+Build:
+
+```sh
+cmake --build build --parallel 1
+```
+
+Run a MARLEY test macro:
+
+```sh
+cd macros
+../build/app/G4_QPIX test.mac
+```
+
+Expected output:
+
+```txt
+$HOME/Programs/Library/SuperNova-Work/output/MARLEY.root
+```
+
+Check it with:
+
+```sh
+rootls $HOME/Programs/Library/SuperNova-Work/output/MARLEY.root
+```
+
+Expected keys include:
+
+```txt
+event_tree  G4_Photons  metadata
+```
+
+For smaller ROOT files compatible with the semi-analytical workflow, add this macro command before `/run/initialize`:
+
+```text
+/inputs/semi_analytical_output true
+```
