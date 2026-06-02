@@ -449,3 +449,74 @@ For smaller ROOT files compatible with the semi-analytical workflow, add this ma
 ```text
 /inputs/semi_analytical_output true
 ```
+
+## Addendum: macOS Build And Warning Compatibility Changes
+
+The following changes are associated with making `SuperNova-Work` build and run cleanly on macOS/Apple Silicon with Geant4 10.7.4, Clang, MARLEY, and no Opticks. They are useful references when comparing the Mac setup against the Linux/GitHub setup.
+
+### Mac Build Setup
+
+These changes are directly related to Mac build/runtime behavior.
+
+`CMakeLists.txt`:
+
+- Defaults `WITH_GEANT4_UIVIS` to `OFF`.
+- Prefers the local batch Geant4 install at `../geant4-v10.7.4/...`.
+- Sets local `PTL_DIR` for the batch Geant4 install.
+- Adds `-Wno-shadow` for Clang builds.
+
+`app/CMakeLists.txt`:
+
+- Adds the generated `cfg` include path.
+- Adds MARLEY runtime rpath pointing at `../marley/build`.
+- Defines `WITH_GEANT4_UIVIS` only when UI/VIS is enabled.
+- Removes direct `target_link_libraries(G4_QPIX MARLEY)` because the library target handles MARLEY.
+
+`src/CMakeLists.txt`:
+
+- Adds the generated `cfg` include path.
+- Finds MARLEY from `$MARLEY`, with fallback `$HOME/Programs/Library/marley`.
+- Adds MARLEY include path and runtime rpath.
+- Uses `find_library(MARLEY_LIBRARY ...)` instead of linking bare `MARLEY`.
+
+`app/G4_QPIX.cpp`:
+
+- Uses `G4RunManagerType::Serial`, so runtime is single-threaded.
+- Guards UI/VIS includes and setup behind `WITH_GEANT4_UIVIS`.
+- Avoids a Geant4 teardown crash seen on this macOS setup by not deleting the run manager at process exit.
+
+`build_singlecore/`:
+
+- Generated build directory.
+- Do not commit this directory.
+
+### Compile, Warning, And Runtime Compatibility Fixes
+
+These changes are not strictly Mac configuration, but they help the project compile and run cleanly with this Geant4/Clang setup.
+
+`src/ActionInitialization.h`, `src/SteppingAction.h`, `src/SupernovaTiming.h`, `src/TrackingAction.cpp`, and `src/TrackingSD.h`:
+
+- Remove unused members or variables.
+
+`src/DetectorConstruction.cpp`:
+
+- Removes an unused local variable for `G4LogicalSkinSurface`.
+
+`src/RunAction.cpp`:
+
+- Replaces `G4StrUtil::to_lower(...)` with standard C++ lowercase conversion using `std::transform` and `std::tolower`.
+
+`src/SteppingAction.cpp`:
+
+- Fixes a signed/unsigned loop warning.
+- Moves scintillation timing/yield code inside `#ifdef With_Opticks`.
+
+`src/AnalysisData.cpp`:
+
+- Adds process keys for `Scintillation` and `User Limit`.
+
+`src/OpticalMaterialProperties.cpp`:
+
+- Adjusts `G4MaterialPropertiesTable` API calls for Geant4 10.7.4 by removing unsupported trailing `true` arguments.
+- Restores/sets scintillation constants needed by the optical physics path.
+- Adds `(void)sc_yield;` to silence an unused-parameter warning.
