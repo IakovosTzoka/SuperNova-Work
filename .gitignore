@@ -3,7 +3,8 @@
 # Build Directory
 
 build/
-
+build_opticks_local/
+build_opticks/
 # Root outputs
 
 output/*.root
